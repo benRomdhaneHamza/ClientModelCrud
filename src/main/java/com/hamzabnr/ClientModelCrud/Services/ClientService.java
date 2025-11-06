@@ -3,6 +3,7 @@ package com.hamzabnr.ClientModelCrud.Services;
 import com.hamzabnr.ClientModelCrud.Exceptions.ClientNotFoundException;
 import com.hamzabnr.ClientModelCrud.Models.ClientModel;
 import com.hamzabnr.ClientModelCrud.Repositories.ClientRepository;
+import com.hamzabnr.ClientModelCrud.dto.ClientDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,12 +64,18 @@ public class ClientService {
     return clientRepository.save(client);
   }
 
-  public List<ClientModel> getClientsFromDB() {
-    return clientRepository.findAll();
+  public List<ClientDTO> getClientsFromDB() {
+    List<ClientModel> clients = clientRepository.findAll();
+    List<ClientDTO> clsDTO = new ArrayList<>();
+    clients.forEach(cl -> {
+      clsDTO.add(new ClientDTO(cl.getName(), cl.getEmail()));
+    });
+    return clsDTO;
   }
 
-  public ClientModel getByIdFromDB(Long id) {
-    return clientRepository.findById(id).orElseThrow(() -> new ClientNotFoundException(id));
+  public ClientDTO getByIdFromDB(Long id) {
+    ClientModel client = clientRepository.findById(id).orElseThrow(() -> new ClientNotFoundException(id));
+    return new ClientDTO(client.getName(), client.getEmail());
   }
 
   public void deleteClientFromDB(Long id) {

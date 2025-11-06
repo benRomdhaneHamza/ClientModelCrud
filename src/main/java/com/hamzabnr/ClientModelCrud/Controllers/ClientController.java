@@ -2,11 +2,18 @@ package com.hamzabnr.ClientModelCrud.Controllers;
 
 import com.hamzabnr.ClientModelCrud.Models.ClientModel;
 import com.hamzabnr.ClientModelCrud.Services.ClientService;
+import com.hamzabnr.ClientModelCrud.dto.ClientDTO;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/clients")
@@ -16,46 +23,67 @@ public class ClientController {
   ClientService clientService;
 
   @GetMapping
-  public List<ClientModel> getClients() {
+  public ResponseEntity<Map<String, Object>> getClients() {
     // return clientService.getAllClients();
-    return clientService.getClientsFromDB();
+    Map<String, Object> body = new HashMap<>();
+    body.put("timestamp", LocalDateTime.now());
+    body.put("clients", clientService.getClientsFromDB());
+    return ResponseEntity.status(HttpStatus.OK).body(body);
   }
 
   @GetMapping("/{id}")
-  public ClientModel getClientById(@PathVariable Long id) {
+  public ResponseEntity<ClientDTO> getClientById(@PathVariable Long id) {
     // return clientService.clientById(id);
-    return clientService.getByIdFromDB(id);
+    ClientDTO client = clientService.getByIdFromDB(id);
+    return ResponseEntity.status(HttpStatus.OK).body(client);
   }
 
   @PostMapping
-  public String addClient(@RequestBody ClientModel client) {
+  public ResponseEntity<ClientDTO> addClient(@Valid @RequestBody ClientDTO client) {
     // clientService.addClient(client);
     // return "new client " + client.getId() + " added successfully";
-    ClientModel addedClient = clientService.addClientToDB(client);
-    return "new client " + addedClient.getId() + " added successfully";
+
+    ClientModel newClient = new ClientModel();
+    newClient.setName(client.getName());
+    newClient.setEmail(client.getEmail());
+    ClientModel savedClient = clientService.addClientToDB(newClient);
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(new ClientDTO(savedClient.getName(), savedClient.getEmail()));
   }
 
   @PostMapping("/bulk")
-  public List<String> addClientBulk(@RequestBody List<ClientModel> clients) {
+  public ResponseEntity<Map<String, Object>> addClientBulk(@Valid @RequestBody List<ClientDTO> clients) {
     List<String> addedClientsIds = new ArrayList<>();
     clients.forEach(cl -> {
-      ClientModel newClient = clientService.addClientToDB(cl);
-      addedClientsIds.add("new client " + newClient.getId() + " added successfully");
+      ClientModel clientModel = new ClientModel();
+      clientModel.setEmail(cl.getEmail());
+      clientModel.setName(cl.getName());
+      ClientModel savedClient = clientService.addClientToDB(clientModel);
+      addedClientsIds.add("new client " + savedClient.getId() + " added successfully");
     });
-    return addedClientsIds;
+
+    Map<String, Object> body = new HashMap<>();
+    body.put("timestamp", LocalDateTime.now().toString());
+    body.put("addedClients",  addedClientsIds);
+    return ResponseEntity.status(HttpStatus.CREATED).body(body);
   }
 
   @PutMapping("/{id}")
-  public ClientModel updateClient(@PathVariable Long id, @RequestBody ClientModel updates) {
+  public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @Valid @RequestBody ClientDTO updates) {
     // return clientService.updateClient(id, updates);
-    return clientService.updateClientInDB(id, updates);
+    ClientModel clUpdates = new ClientModel();
+    clUpdates.setName(updates.getName());
+    clUpdates.setEmail(updates.getEmail());
+    ClientModel updatedClient = clientService.updateClientInDB(id, clUpdates);
+
+    return ResponseEntity.status(HttpStatus.OK).body(new ClientDTO(updatedClient.getName(), updatedClient.getEmail()));
   }
 
   @DeleteMapping("/{id}")
-  public String deleteClient(@PathVariable Long id) {
+  public ResponseEntity<String> deleteClient(@PathVariable Long id) {
     // clientService.deleteClient(id);
     clientService.deleteClientFromDB(id);
-    return "client " + id + " deleted successfully";
+    return ResponseEntity.status(HttpStatus.OK).body("client " + id + " deleted successfully");
   }
 
 }

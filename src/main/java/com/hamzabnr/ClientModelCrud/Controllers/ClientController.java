@@ -43,23 +43,15 @@ public class ClientController {
     // clientService.addClient(client);
     // return "new client " + client.getId() + " added successfully";
 
-    ClientModel newClient = new ClientModel();
-    newClient.setName(client.getName());
-    newClient.setEmail(client.getEmail());
-    ClientModel savedClient = clientService.addClientToDB(newClient);
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(new ClientDTO(savedClient.getName(), savedClient.getEmail()));
+    return ResponseEntity.status(HttpStatus.CREATED).body(clientService.addClientToDB(client));
   }
 
   @PostMapping("/bulk")
   public ResponseEntity<Map<String, Object>> addClientBulk(@Valid @RequestBody List<ClientDTO> clients) {
     List<String> addedClientsIds = new ArrayList<>();
     clients.forEach(cl -> {
-      ClientModel clientModel = new ClientModel();
-      clientModel.setEmail(cl.getEmail());
-      clientModel.setName(cl.getName());
-      ClientModel savedClient = clientService.addClientToDB(clientModel);
-      addedClientsIds.add("new client " + savedClient.getId() + " added successfully");
+      ClientDTO savedClient = clientService.addClientToDB(cl);
+      addedClientsIds.add("new client " + savedClient.getName() + " added successfully");
     });
 
     Map<String, Object> body = new HashMap<>();
@@ -71,12 +63,9 @@ public class ClientController {
   @PutMapping("/{id}")
   public ResponseEntity<ClientDTO> updateClient(@PathVariable Long id, @Valid @RequestBody ClientDTO updates) {
     // return clientService.updateClient(id, updates);
-    ClientModel clUpdates = new ClientModel();
-    clUpdates.setName(updates.getName());
-    clUpdates.setEmail(updates.getEmail());
-    ClientModel updatedClient = clientService.updateClientInDB(id, clUpdates);
+    ClientDTO updatedClient = clientService.updateClientInDB(id, updates);
 
-    return ResponseEntity.status(HttpStatus.OK).body(new ClientDTO(updatedClient.getName(), updatedClient.getEmail()));
+    return ResponseEntity.status(HttpStatus.OK).body(updatedClient);
   }
 
   @DeleteMapping("/{id}")

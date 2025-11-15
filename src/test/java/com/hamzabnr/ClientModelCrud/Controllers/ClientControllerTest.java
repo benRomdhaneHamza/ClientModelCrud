@@ -6,6 +6,8 @@ import com.hamzabnr.ClientModelCrud.dto.ClientDTO;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureMockMvc
 public class ClientControllerTest {
 
+  private static final Logger log = LoggerFactory.getLogger(ClientControllerTest.class);
   @Autowired
   private ClientRepository clientRepository;
 
@@ -46,6 +49,14 @@ public class ClientControllerTest {
   public void shouldGetHealthCheck() {
     String result =  this.testRestTemplate.getForObject("/health", String.class);
     assert(result.equals("Api is running ..."));
+  }
+
+
+  @Test
+  public void shouldReturnNotFoundWhenClientNotFound() {
+    ResponseEntity<Map> response = testRestTemplate.getForEntity("/clients/" + 999, Map.class);
+    log.trace(response.toString());
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
   }
 
   @Test
@@ -117,11 +128,6 @@ public class ClientControllerTest {
     assertThat(updatedClient.get("email")).isEqualTo("testClientModified@mail.com");
   }
 
-  @Test
-  public void shouldReturnNotFoundWhenClientNotFound() {
-    ResponseEntity<Map> response = testRestTemplate.getForEntity("/clients/" + 5, Map.class);
-    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-  }
 
   @Test
   public void shoudReturnInvalidEmailFormat() {

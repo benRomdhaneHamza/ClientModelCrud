@@ -1,19 +1,23 @@
 package com.hamzabnr.ClientModelCrud.Services;
 
-import com.hamzabnr.ClientModelCrud.Config.ModelMapperConfig;
 import com.hamzabnr.ClientModelCrud.Exceptions.ClientNotFoundException;
 import com.hamzabnr.ClientModelCrud.Models.ClientModel;
 import com.hamzabnr.ClientModelCrud.Repositories.ClientRepository;
 import com.hamzabnr.ClientModelCrud.dto.ClientDTO;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class ClientService {
 
+  private static final Logger log = LoggerFactory.getLogger(ClientService.class);
   // In-memory list to simulate a database
   private final List<ClientModel> clientsList = new ArrayList<>(List.of(
       new ClientModel(1L, "name client 1", "email client 1"),
@@ -63,9 +67,11 @@ public class ClientService {
   }
 
   public ClientDTO addClientToDB(ClientDTO client) {
+    log.trace("addClientToDB, params, ClientDTO", client.toString());
     ClientModel savedClient = clientRepository.save(modelMapper.map(client, ClientModel.class));
     // return new ClientDTO(savedClient.getName(), savedClient.getEmail());
     // using a ModelMapper to map ClientModel to ClientDTO
+    log.trace("addClientToDB, result to return, ClientDTO", modelMapper.map(savedClient, ClientDTO.class));
     return modelMapper.map(savedClient, ClientDTO.class);
   }
 

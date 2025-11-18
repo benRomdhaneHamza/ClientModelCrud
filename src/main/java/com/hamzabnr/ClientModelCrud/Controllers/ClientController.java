@@ -3,6 +3,8 @@ package com.hamzabnr.ClientModelCrud.Controllers;
 import com.hamzabnr.ClientModelCrud.Models.ClientModel;
 import com.hamzabnr.ClientModelCrud.Services.ClientService;
 import com.hamzabnr.ClientModelCrud.dto.ClientDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Tag(
+    name = "Clients",
+    description = "Operation for clients crud"
+)
+
 @RestController
 @RequestMapping("/clients")
 public class ClientController {
@@ -22,6 +29,10 @@ public class ClientController {
   @Autowired
   ClientService clientService;
 
+  @Operation(
+      summary = "Retrieve all clients",
+      description = "Returns a list of all clients stored in the database"
+  )
   @GetMapping
   public ResponseEntity<Map<String, Object>> getClients() {
     // return clientService.getAllClients();

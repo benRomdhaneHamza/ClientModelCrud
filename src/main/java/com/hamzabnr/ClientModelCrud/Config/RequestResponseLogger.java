@@ -33,8 +33,8 @@ public class RequestResponseLogger extends OncePerRequestFilter {
     String requestBody = new String(wrappedRequest.getContentAsByteArray());
     String responseBody = new String(wrappedResponse.getContentAsByteArray());
 
-    logger.info("Request body: {}" + requestBody.toString());
-    logger.info("Response body: {}" + responseBody);
+    // logger.info("Request body: {}" + requestBody.toString());
+    // logger.info("Response body: {}" + responseBody);
 
     wrappedResponse.copyBodyToResponse();
 

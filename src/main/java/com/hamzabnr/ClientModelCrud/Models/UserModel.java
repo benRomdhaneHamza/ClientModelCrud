@@ -52,4 +52,14 @@ public class UserModel {
   public void setRole(String role) {
     this.role = role;
   }
+
+  @Override
+  public String toString() {
+    return "UserModel{" +
+        "id=" + id +
+        ", username='" + username + '\'' +
+        ", password='" + password + '\'' +
+        ", role='" + role + '\'' +
+        '}';
+  }
 }

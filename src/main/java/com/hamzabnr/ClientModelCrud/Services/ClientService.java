@@ -67,11 +67,9 @@ public class ClientService {
   }
 
   public ClientDTO addClientToDB(ClientDTO client) {
-    log.trace("addClientToDB, params, ClientDTO", client.toString());
     ClientModel savedClient = clientRepository.save(modelMapper.map(client, ClientModel.class));
     // return new ClientDTO(savedClient.getName(), savedClient.getEmail());
     // using a ModelMapper to map ClientModel to ClientDTO
-    log.trace("addClientToDB, result to return, ClientDTO", modelMapper.map(savedClient, ClientDTO.class));
     return modelMapper.map(savedClient, ClientDTO.class);
   }
 

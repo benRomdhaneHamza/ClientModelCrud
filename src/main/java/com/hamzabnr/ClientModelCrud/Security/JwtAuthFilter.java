@@ -1,5 +1,6 @@
 package com.hamzabnr.ClientModelCrud.Security;
 
+import com.hamzabnr.ClientModelCrud.Repositories.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
